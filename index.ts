@@ -1,9 +1,15 @@
-const express = require("express");
+import fs from "fs";
+import express from "express";
 const app = express();
-const cors = require('cors'); 
-require("dotenv").config();
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+import cors from "cors";
+
+import dotenv from "dotenv";
+dotenv.config();
+
+fs.writeFileSync("test.txt", "test");
+
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
 
 app.use(cors());
 
@@ -16,11 +22,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
-var v1 = require('./api/routes');
+// import {router} from './routes/index.ts';
+import {router} from './server/routes/index';
+app.use('/api', router);
 
-app.use('/api', v1.router);
-
-app.use(function(req, res) {
+app.use(function(req:any, res:any) {
     res.status(404).send({url: req.originalUrl + ' not found'})
 });
 
