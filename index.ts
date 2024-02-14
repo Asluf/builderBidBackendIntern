@@ -31,5 +31,5 @@ app.use(function(req:any, res:any) {
 });
 
 app.listen(port, () => {
-    console.log(`BuilderBid server started on: ${port}`);
+    console.log(`BuilderBid server running on: ${port}`);
 });
