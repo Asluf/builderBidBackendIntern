@@ -1,24 +1,31 @@
 import express, { Express, Request, Response } from "express";
-import fs from "fs";
 import bodyParser from "body-parser";
 import cors from "cors";
-import UserRoute from "./server/routes/userRoute";
+import planRoute from "./server/routes/planRoute";
 import DbConnection from "../database";
+import 'dotenv/config';
+import env from "../src/util/validateEnv";
+
 
 
 const app: Express = express();
-fs.writeFileSync("test.txt", "test");
+const port = env.PORT;
 app.use(cors());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 DbConnection();
 
 app.use('/uploads', express.static('uploads'));
 
-app.use('/api/v1/dk', UserRoute);
+app.use('/api/v1/dk', planRoute);
 
 app.get('/*', (req:Request,res:Response)=>{
     res.status(404).send(`<h1>404 Error<h1>`);
 });
+
+app.listen(port, () => {
+    console.log(`BuilderBid server running on: ${port}`);
+});
+
 

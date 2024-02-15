@@ -1,17 +1,13 @@
 import "dotenv/config";
-import express, {Express} from "express";
 import mongoose from "mongoose";
+import env from "./src/util/validateEnv";
 
-const app: Express = express();
-const port = process.env.PORT;
 
 const DbConnection = async () => {
-    await mongoose.connect(`${process.env.DB_URI}`)
+    await mongoose.connect(env.DB_URI)
     .then((con)=>{
-        console.log(`MongoDB is connected to the host :${con.connection.host}`);
-        app.listen(port, () => {
-            console.log(`BuilderBid server running on: ${port}`);
-        });
+        console.log(`MongoDB is connected to the host :${con.connection.name}`);
+       
     })
     .catch((err)=>{
         console.log(err)
