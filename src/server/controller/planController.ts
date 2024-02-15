@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import ImageModel from '../models/imageModel'; 
 import PlanModel from '../models/planModel'; 
+import path from 'path';
 
 
 export const getUser = async (req: Request, res: Response) => {
@@ -13,9 +14,13 @@ export const savePlan =  async (req: Request, res: Response) => {
   try {
     const { sheetName, planType, planScale, note } = req.body;
 
-    const newImage = await ImageModel.create({
-      filename: 'example.jpg', 
-      path: '/uploads/example.jpg', 
+    if(!req.file){
+      return res.status(400).json({ message: 'Image file not available'});
+    }
+
+    const planImage = await ImageModel.create({
+      filename: req.file.filename, 
+      path: req.file.path + path.extname(req.file.originalname), 
     });
 
     const newPlan = await PlanModel.create({
@@ -23,7 +28,7 @@ export const savePlan =  async (req: Request, res: Response) => {
       planType,
       planScale,
       note,
-      imageId: newImage._id, 
+      imageId: planImage._id, 
     });
 
     res.status(201).json({newPlan: newPlan});

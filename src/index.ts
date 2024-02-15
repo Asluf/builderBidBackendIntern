@@ -3,9 +3,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import planRoute from "./server/routes/planRoute";
 import DbConnection from "../database";
-import 'dotenv/config';
+import "dotenv/config"
 import env from "../src/util/validateEnv";
-
 
 
 const app: Express = express();
@@ -27,5 +26,3 @@ app.get('/*', (req:Request,res:Response)=>{
 app.listen(port, () => {
     console.log(`BuilderBid server running on: ${port}`);
 });
-
-
