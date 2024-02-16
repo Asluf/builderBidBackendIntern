@@ -1,18 +1,10 @@
-import "dotenv/config";
-import mongoose from "mongoose";
-import env from "./src/util/validateEnv";
-
-
-
-const DbConnection = async () => {
-    await mongoose.connect(env.DB_URI)
-    .then((con)=>{
-        console.log(`MongoDB is connected to the host :${con.connection.name}`);
-    })
-    .catch((err)=>{
+const mongoose = require('mongoose');
+const DbConnection = async ()=>{
+    await mongoose.connect(process.env.DATABASE)
+    .then((con:any)=>console.log(`MongoDB is connected to the database :${con.connection.name}`))
+    .catch((err:any)=>{
         console.log(err)
-    })
-
+    });
 }
 
-export default DbConnection;
+module.exports = DbConnection  

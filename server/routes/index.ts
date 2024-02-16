@@ -4,7 +4,7 @@ import { router as userRoutes } from './UserRoutes'; // Import the named export
 
 const router = express.Router();
 
-router.get('/', function(req, res){    
+router.get('/', function(req:any, res:any){    
     res.json({ message: "Welcome to API!" });
 });
 
