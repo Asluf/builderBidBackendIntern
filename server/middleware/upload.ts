@@ -1,19 +1,18 @@
-const multer = require("multer");
-const path = require("path");
-
+import multer from 'multer';
+import path from 'path';
 // upload the floor plan image
 const storage = multer.diskStorage({
-  destination: (req:any, file:any, cb:any) => {
+  destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
-  filename: (req:any, file:any, cb:any) => {
-    let ext = path.extname(file.originalname);
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
     cb(null, Date.now() + ext);
   },
 });
-exports.uploadFloorPlan = multer({
+export const uploadFloorPlan = multer({
   storage: storage,
-  fileFilter: function (req:any, file:any, callback:any) {
+  fileFilter: function (req, file, callback) {
     if (
       file.mimetype == "image/png" ||
       file.mimetype == "image/jpg" ||

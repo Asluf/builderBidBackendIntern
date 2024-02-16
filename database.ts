@@ -1,10 +1,18 @@
-const mongoose = require('mongoose');
-const DbConnection = async ()=>{
-    await mongoose.connect(process.env.DATABASE)
-    .then((con:any)=>console.log(`MongoDB is connected to the database :${con.connection.name}`))
-    .catch((err:any)=>{
+import "dotenv/config";
+import mongoose from "mongoose";
+import env from "./server/middleware/validateEnv";
+
+
+
+const DbConnection = async () => {
+    await mongoose.connect(env.DATABASE)
+    .then((con)=>{
+        console.log(`MongoDB is connected to the host :${con.connection.name}`);
+    })
+    .catch((err)=>{
         console.log(err)
-    });
+    })
+
 }
 
-module.exports = DbConnection  
+export default DbConnection;

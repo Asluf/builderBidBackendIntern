@@ -1,31 +1,28 @@
 import fs from "fs";
-import express from "express";
-const app = express();
+import express, {Express,Request,Response} from "express";
+import {router} from './routes/index';
 import cors from "cors";
-
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
+import DbConnection from "../database";
+import bodyParser from "body-parser";
+import env from "./middleware/validateEnv";
 
 fs.writeFileSync("test.txt", "test");
 
-import bodyParser from "body-parser";
-import mongoose from "mongoose";
-
+const app: Express = express();
 app.use(cors());
 
-var port = process.env.PORT || 6000;
-const DbConnection = require("./database");
+const port = env.PORT;
+
 DbConnection();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
-// import {router} from './routes/index.ts';
-import {router} from './server/routes/index';
 app.use('/api', router);
 
-app.use(function(req:any, res:any) {
+app.use(function(req:Request, res:Response) {
     res.status(404).send({url: req.originalUrl + ' not found'})
 });
 

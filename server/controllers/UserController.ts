@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import Uploads from '../models/UploadsModel';
 import Floorplan from '../models/FloorplanModel';
 
@@ -8,7 +8,7 @@ export const getUser = function(req: Request, res: Response) {
 };
 
 
-export const saveFloorPlan = async (req: any, res: any) => {
+export const saveFloorPlan = async (req: Request, res: Response) => {
   try {
     const file = req.file;
     if (!file) {
@@ -35,4 +35,26 @@ export const saveFloorPlan = async (req: any, res: any) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }
+
+export const getFloorPlan = async (req: Request, res: Response) => {
+  try {
+    const floorPlan = await Floorplan.find();
+    if(floorPlan.length > 0){
+      const planDetails = await Promise.all(
+        floorPlan.map(async (plan) => {
+          const planImg = await Uploads.findById(plan.image_id);
+          return { plan, planImage: planImg };
+        })
+      );
+      res.status(200).json({ floorPlan: planDetails });
+    }
+    else{
+      res.status(400).json({ message:"No Floor Plan Details Found" });
+    }
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
