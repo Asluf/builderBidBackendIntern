@@ -20,7 +20,7 @@ export const savePlan =  async (req: Request, res: Response) => {
 
     const planImage = await ImageModel.create({
       filename: req.file.filename, 
-      path: req.file.path + path.extname(req.file.originalname), 
+      path: req.file.path, 
     });
 
     const newPlan = await PlanModel.create({
