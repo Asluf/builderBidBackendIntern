@@ -14,9 +14,8 @@ import mongoose from "mongoose";
 app.use(cors());
 
 var port = process.env.PORT || 6000;
-
-// const DbConnection = require("./database");
-// DbConnection();
+const DbConnection = require("./database");
+DbConnection();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
