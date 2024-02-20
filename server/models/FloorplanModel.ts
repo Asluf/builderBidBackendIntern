@@ -26,7 +26,17 @@ var FloorplanSchema = new Schema({
   notes: {
     type: String,
   },
+  deleted: {
+    type: Boolean,
+    maxlength: 20,
+    default: false,
+  },
   created_date: {
+    type: Date,
+    maxlength: 200,
+    default: Date.now,
+  },
+  updated_date: {
     type: Date,
     maxlength: 200,
     default: Date.now,

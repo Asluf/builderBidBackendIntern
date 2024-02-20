@@ -7,7 +7,9 @@ export const getUser = function (req: Request, res: Response) {
   res.status(200).json({ message: "User API is working!" });
 };
 
-export const saveFloorPlan = async (req: any, res: any) => {
+// saveFloorPlan
+export const saveFloorPlan = async (req: any, res: any, next: any) => {
+  
   try {
     const file = req.file;
     if (!file) {
@@ -29,13 +31,14 @@ export const saveFloorPlan = async (req: any, res: any) => {
     const savedFloorplan = await floorplan.save();
 
     res
-      .status(201)
+      .status(200)
       .json({ message: "Floorplan saved successfully", savedFloorplan });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
+
 // get one floor plan according to id
 export const getFloorPlan = function (req: Request, res: Response) {
   const planId = req.params.plan_id;
@@ -57,6 +60,7 @@ export const getFloorPlan = function (req: Request, res: Response) {
     {
       $match: {
         _id: mongoose.Types.ObjectId.createFromHexString(planId),
+        deleted: false,
       },
     },
   ])
