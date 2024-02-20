@@ -60,7 +60,7 @@ export const getFloorPlan = function (req: Request, res: Response) {
     {
       $match: {
         _id: mongoose.Types.ObjectId.createFromHexString(planId),
-        deleted: false,
+        active: true,
       },
     },
   ])

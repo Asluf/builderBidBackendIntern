@@ -26,10 +26,10 @@ var FloorplanSchema = new Schema({
   notes: {
     type: String,
   },
-  deleted: {
+  active: {
     type: Boolean,
     maxlength: 20,
-    default: false,
+    default: true,
   },
   created_date: {
     type: Date,
