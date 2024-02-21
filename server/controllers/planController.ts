@@ -6,10 +6,6 @@ import mongoose from 'mongoose';
 // import { deleteUploadedFile } from '../middleware/deletedImageFile';
 
 
-export const getUser = function(req: Request, res: Response) {
-  res.status(200).json({ message: "User API is working!" });
-};
-
 export const saveFloorPlan = async (req: Request, res: Response) => {
   try {
     const file = req.file;
@@ -99,6 +95,7 @@ export const getFloorPlan = function (req: Request, res: Response) {
     },
   ])
     .then((data) => {
+      console.log("hi");
       if (!data || data.length === 0) {
         return res
           .status(404)
@@ -140,7 +137,11 @@ export const getFloorPlanByType = async (req: Request, res: Response) => {
     {$match: {type: type, active: true}},
    ])
     if (planDetails.length > 0) {
-      res.status(200).json({ FloorPlanByType: planDetails });
+      return res.status(200).json({
+        success: true,
+        message: `Floor plan found`,
+        data: planDetails,
+      });
     } else {
       res.status(400).json({ message: "No Floor Plan Details Found" });
     }
@@ -154,7 +155,7 @@ export const deleteFloorPlan = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const deleteFloorPlan = await Floorplan.findByIdAndUpdate({ _id:id},{active:false},{new:true});
-    res.status(200).json({ message: 'Floorplan deleted successfully',deleteFloorPlan:deleteFloorPlan});   
+    res.status(200).json({ message: 'Floorplan deleted successfully',data:deleteFloorPlan});   
    } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -183,7 +184,7 @@ export const updateFloorPlan = async (req: Request, res: Response) => {
     if (!updateFloorPlanDetails)
       return res.status(404).json({ error: 'No floor plan details found for the given ID' });
 
-    return res.status(200).json({ message: 'FloorPlan Updated', updateFloorPlanDetails });
+    return res.status(200).json({ message: 'FloorPlan Updated', data:updateFloorPlanDetails });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal Server Error' });

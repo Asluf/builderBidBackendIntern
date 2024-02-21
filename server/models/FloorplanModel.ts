@@ -58,11 +58,9 @@ const floorValidationSchema = Joi.object({
   floorplan_name: Joi.string().max(100),
   type: Joi.string().valid('Layout/FloorPlan', 'Elevation', 'FoundationPlan', 'SitePlan/PlotPlan').max(200),
   scale: Joi.string().valid('1/32" = 1\'', '1/16" = 1\'', '3/32" = 1\'', '1/8" = 1\'', '3/16" = 1\'').max(200),
-  image_id: Joi.string().alphanum().length(24),
   notes: Joi.string(),
-  created_date: Joi.date().max('now'),
 })
   .min(1)
-  .or('floorplan_name', 'type', 'scale', 'image_id', 'notes', 'created_date');
+  .or('floorplan_name', 'type', 'scale', 'notes');
 
 export { Floorplan, floorValidationSchema };
