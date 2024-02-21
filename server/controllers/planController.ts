@@ -1,44 +1,15 @@
 import { Request, Response } from 'express';
 import Uploads from '../models/UploadsModel';
 import {Floorplan, floorValidationSchema} from '../models/FloorplanModel';
+import mongoose from 'mongoose';
 // import fs from "fs";
 // import { deleteUploadedFile } from '../middleware/deletedImageFile';
-
-
 
 
 export const getUser = function(req: Request, res: Response) {
   res.status(200).json({ message: "User API is working!" });
 };
 
-
-// export const saveFloorPlan = async (req: Request, res: Response) => {
-//   try {
-//     const file = req.file;
-//     if (!file) {
-//       return res.status(400).json({ error: "No file uploaded." });
-//     }
-
-//     const { floorplan_name, type, scale, notes } = req.body;
-//     const upload = new Uploads({ img_path: file.path});
-//     const savedUpload = await upload.save();
-
-//     const floorplan = new Floorplan({
-//       floorplan_name,
-//       type,
-//       scale,
-//       image_id: savedUpload._id, 
-//       notes,
-//     });
-
-//     const savedFloorplan = await floorplan.save();
-
-//     res.status(201).json({ message: 'Floorplan saved successfully', savedFloorplan });
-//   } catch (error:any) {
-//     console.error(error);
-//     res.status(500).json({ error: error });
-//   }
-// }
 export const saveFloorPlan = async (req: Request, res: Response) => {
   try {
     const file = req.file;
@@ -48,15 +19,7 @@ export const saveFloorPlan = async (req: Request, res: Response) => {
     }
 
     const { floorplan_name, type, scale, notes } = req.body;
-    // const floorplanData = { floorplan_name, type, scale, notes };
-    // const validationResult = floorValidationSchema.validate(floorplanData, { abortEarly: false });
-
-    // if (validationResult.error) {
-    //   const validationErrors = validationResult.error.details.map((detail) => detail.message);
-    //   await deleteUploadedFile(file.path);
-    //   return res.status(400).json({ error: validationErrors });
-    // }
-    // await uploadFloorPlan(req,res,error);
+   
     const upload = new Uploads({ img_path: file.path });
     const savedUpload = await upload.save();
 
@@ -77,30 +40,8 @@ export const saveFloorPlan = async (req: Request, res: Response) => {
   }
 };
 
-// export const getFloorPlan = async (req: Request, res: Response) => {
-//   try {
-//     const floorPlan = await Floorplan.find();
-//     if(floorPlan.length > 0){
-//       const planDetails = await Promise.all(
-//         floorPlan.map(async (plan) => {
-//           const planImg = await Uploads.findById(plan.image_id);
-//           return { plan, planImage: planImg };
-//         })
-//       );
-//       res.status(200).json({ floorPlan: planDetails });
-//     }
-//     else{
-//       res.status(400).json({ message:"No Floor Plan Details Found" });
-//     }
-    
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// };
 
-
-export const getFloorPlan = async (req: Request, res: Response) => {
+export const getAllFloorPlan = async (req: Request, res: Response) => {
   try {
     const planDetails = await Floorplan.aggregate([
       {
@@ -130,6 +71,52 @@ export const getFloorPlan = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+};
+
+// get one floor plan according to id
+export const getFloorPlan = function (req: Request, res: Response) {
+  const planId = req.params.plan_id;
+
+  if (!planId || planId.length !== 24) {
+    return res.status(400).json({ success: false, message: "Invalid plan_id" });
+  }
+
+  Floorplan.aggregate([
+    {
+      $lookup: {
+        from: "uploads",
+        localField: "image_id",
+        foreignField: "_id",
+        as: "floorPlanImage",
+      },
+    },
+    { $unwind: "$floorPlanImage" },
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId.createFromHexString(planId),
+        active: true,
+      },
+    },
+  ])
+    .then((data) => {
+      if (!data || data.length === 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Floor plan not found!" });
+      }
+      return res.status(200).json({
+        success: true,
+        message: `Floor plan found`,
+        data: data,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        success: true,
+        message: "Something went wrong",
+        data: err,
+      });
+    });
 };
 
 export const getFloorPlanByType = async (req: Request, res: Response) => {
