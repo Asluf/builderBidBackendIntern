@@ -1,10 +1,10 @@
 // index.ts
-import express from 'express';
+import express, {Request,Response} from 'express';
 import { router as userRoutes } from './UserRoutes'; // Import the named export
 
 const router = express.Router();
 
-router.get('/', function(req:any, res:any){    
+router.get('/', function(req:Request, res:Response){    
     res.json({ message: "Welcome to API!" });
 });
 

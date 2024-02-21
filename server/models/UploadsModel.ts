@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var UploadsSchema = new Schema({
+const UploadsSchema = new Schema({
    
     img_path: {
         type: String,
