@@ -1,10 +1,9 @@
-import { Request, Response } from 'express';
-import Uploads from '../models/UploadsModel';
-import {Floorplan, floorValidationSchema} from '../models/FloorplanModel';
-import mongoose from 'mongoose';
+import { Request, Response } from "express";
+import Uploads from "../models/UploadsModel";
+import { Floorplan, floorValidationSchema } from "../models/FloorplanModel";
+import mongoose from "mongoose";
 // import fs from "fs";
 // import { deleteUploadedFile } from '../middleware/deletedImageFile';
-
 
 export const saveFloorPlan = async (req: Request, res: Response) => {
   try {
@@ -15,7 +14,7 @@ export const saveFloorPlan = async (req: Request, res: Response) => {
     }
 
     const { floorplan_name, type, scale, notes } = req.body;
-   
+
     const upload = new Uploads({ img_path: file.path });
     const savedUpload = await upload.save();
 
@@ -29,43 +28,52 @@ export const saveFloorPlan = async (req: Request, res: Response) => {
 
     const savedFloorplan = await floorplan.save();
 
-    res.status(201).json({ message: 'Floorplan saved successfully', savedFloorplan });
+    res
+      .status(201)
+      .json({ message: "Floorplan saved successfully", savedFloorplan });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 export const getAllFloorPlan = async (req: Request, res: Response) => {
   try {
     const planDetails = await Floorplan.aggregate([
       {
         $lookup: {
-          from: 'uploads',
-          localField: 'image_id',
-          foreignField: '_id',
-          as: 'planImage'
-        }
+          from: "uploads",
+          localField: "image_id",
+          foreignField: "_id",
+          as: "planImage",
+        },
       },
       {
         $unwind: {
-          path: '$planImage',
-          preserveNullAndEmptyArrays: true
-        }
+          path: "$planImage",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-      {$match: {active: true}}
+      { $match: { active: true } },
     ]);
 
     if (planDetails.length > 0) {
-      res.status(200).json({ floorPlan: planDetails });
+      return res.status(200).json({
+        success: true,
+        message: `Floor plan found`,
+        floorPlan: planDetails,
+      });
     } else {
-      res.status(400).json({ message: "No Floor Plan Details Found" });
+      return res
+        .status(404)
+        .json({ success: true, message: "Floor plan not found!" });
     }
-
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({
+      success: true,
+      message: "Something went wrong",
+      data: error,
+    });
   }
 };
 
@@ -95,11 +103,10 @@ export const getFloorPlan = function (req: Request, res: Response) {
     },
   ])
     .then((data) => {
-      console.log("hi");
       if (!data || data.length === 0) {
         return res
           .status(404)
-          .json({ success: false, message: "Floor plan not found!" });
+          .json({ success: true, message: "Floor plan not found!" });
       }
       return res.status(200).json({
         success: true,
@@ -118,24 +125,24 @@ export const getFloorPlan = function (req: Request, res: Response) {
 
 export const getFloorPlanByType = async (req: Request, res: Response) => {
   try {
-   const type = req.params.type;
-   const planDetails = await Floorplan.aggregate([
-    {
-      $lookup: {
-        from: 'uploads',
-        localField: 'image_id',
-        foreignField: '_id',
-        as: 'planImage'
-      }
-    },
-    {
-      $unwind: {
-        path: '$planImage',
-        preserveNullAndEmptyArrays: true
-      }
-    },
-    {$match: {type: type, active: true}},
-   ])
+    const type = req.params.type;
+    const planDetails = await Floorplan.aggregate([
+      {
+        $lookup: {
+          from: "uploads",
+          localField: "image_id",
+          foreignField: "_id",
+          as: "planImage",
+        },
+      },
+      {
+        $unwind: {
+          path: "$planImage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      { $match: { type: type, active: true } },
+    ]);
     if (planDetails.length > 0) {
       return res.status(200).json({
         success: true,
@@ -147,29 +154,43 @@ export const getFloorPlanByType = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 export const deleteFloorPlan = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const deleteFloorPlan = await Floorplan.findByIdAndUpdate({ _id:id},{active:false},{new:true});
-    res.status(200).json({ message: 'Floorplan deleted successfully',data:deleteFloorPlan});   
-   } catch (error) {
+    const deleteFloorPlan = await Floorplan.findByIdAndUpdate(
+      { _id: id },
+      { active: false },
+      { new: true }
+    );
+    res
+      .status(200)
+      .json({
+        message: "Floorplan deleted successfully",
+        data: deleteFloorPlan,
+      });
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-
 export const updateFloorPlan = async (req: Request, res: Response) => {
   try {
-    const validationResult = floorValidationSchema.validate(req.body, { abortEarly: false });
+    const validationResult = floorValidationSchema.validate(req.body, {
+      abortEarly: false,
+    });
 
     if (validationResult.error) {
-      const errorMessages = validationResult.error.details.map((detail) => detail.message);
-      return res.status(400).json({ error: 'Validation Error', details: errorMessages });
+      const errorMessages = validationResult.error.details.map(
+        (detail) => detail.message
+      );
+      return res
+        .status(400)
+        .json({ error: "Validation Error", details: errorMessages });
     }
 
     const id = req.params.id;
@@ -177,16 +198,20 @@ export const updateFloorPlan = async (req: Request, res: Response) => {
 
     const updateFloorPlanDetails = await Floorplan.findByIdAndUpdate(
       { _id: id },
-      { floorplan_name, type, scale, notes, updated_date: Date.now()},
+      { floorplan_name, type, scale, notes, updated_date: Date.now() },
       { new: true }
     );
 
     if (!updateFloorPlanDetails)
-      return res.status(404).json({ error: 'No floor plan details found for the given ID' });
+      return res
+        .status(404)
+        .json({ error: "No floor plan details found for the given ID" });
 
-    return res.status(200).json({ message: 'FloorPlan Updated', data:updateFloorPlanDetails });
+    return res
+      .status(200)
+      .json({ message: "FloorPlan Updated", data: updateFloorPlanDetails });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
