@@ -56,18 +56,11 @@ export const getAllFloorPlan = async (req: Request, res: Response) => {
       },
       { $match: { active: true } },
     ]);
-
-    if (planDetails.length > 0) {
-      return res.status(200).json({
-        success: true,
-        message: `Floor plan found`,
-        floorPlan: planDetails,
-      });
-    } else {
-      return res
-        .status(404)
-        .json({ success: true, message: "Floor plan not found!" });
-    }
+    return res.status(200).json({
+      success: true,
+      message: `Floor plan found`,
+      floorPlan: planDetails,
+    });
   } catch (error) {
     return res.status(500).json({
       success: true,
@@ -103,11 +96,6 @@ export const getFloorPlan = function (req: Request, res: Response) {
     },
   ])
     .then((data) => {
-      if (!data || data.length === 0) {
-        return res
-          .status(404)
-          .json({ success: true, message: "Floor plan not found!" });
-      }
       return res.status(200).json({
         success: true,
         message: `Floor plan found`,
@@ -166,12 +154,10 @@ export const deleteFloorPlan = async (req: Request, res: Response) => {
       { active: false },
       { new: true }
     );
-    res
-      .status(200)
-      .json({
-        message: "Floorplan deleted successfully",
-        data: deleteFloorPlan,
-      });
+    res.status(200).json({
+      message: "Floorplan deleted successfully",
+      data: deleteFloorPlan,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
