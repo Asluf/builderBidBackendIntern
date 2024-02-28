@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Uploads from "../models/UploadsModel";
 import { Floorplan, floorValidationSchema } from "../models/FloorplanModel";
-import mongoose from "mongoose";
 // import fs from "fs";
 // import { deleteUploadedFile } from '../middleware/deletedImageFile';
 
@@ -71,44 +70,36 @@ export const getAllFloorPlan = async (req: Request, res: Response) => {
 };
 
 // get one floor plan according to id
-export const getFloorPlan = function (req: Request, res: Response) {
+export const getFloorPlan = async (req: Request, res: Response) => {
   const planId = req.params.plan_id;
 
   if (!planId || planId.length !== 24) {
     return res.status(400).json({ success: false, message: "Invalid plan_id" });
   }
 
-  Floorplan.aggregate([
-    {
-      $lookup: {
-        from: "uploads",
-        localField: "image_id",
-        foreignField: "_id",
-        as: "floorPlanImage",
-      },
-    },
-    { $unwind: "$floorPlanImage" },
-    {
-      $match: {
-        _id: mongoose.Types.ObjectId.createFromHexString(planId),
-        active: true,
-      },
-    },
-  ])
-    .then((data) => {
-      return res.status(200).json({
-        success: true,
-        message: `Floor plan found`,
-        data: data,
-      });
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        success: true,
-        message: "Something went wrong",
-        data: err,
-      });
+  try {
+    const floorPlan = await Floorplan.findOne({
+      _id: planId, 
+      active: true,
+    }).populate('image_id'); 
+
+    if (!floorPlan) {
+      return res.status(404).json({ success: false, message: "Floor plan not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Floor plan found",
+      data: floorPlan,
     });
+  } catch (error) {
+    console.error("Error fetching floor plan:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      data: error,
+    });
+  }
 };
 
 export const getFloorPlanByType = async (req: Request, res: Response) => {
