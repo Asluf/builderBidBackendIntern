@@ -79,12 +79,14 @@ export const getFloorPlan = async (req: Request, res: Response) => {
 
   try {
     const floorPlan = await Floorplan.findOne({
-      _id: planId, 
+      _id: planId,
       active: true,
-    }).populate('image_id'); 
+    }).populate("image_id");
 
     if (!floorPlan) {
-      return res.status(404).json({ success: false, message: "Floor plan not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Floor plan not found" });
     }
 
     return res.status(200).json({
@@ -122,15 +124,11 @@ export const getFloorPlanByType = async (req: Request, res: Response) => {
       },
       { $match: { type: type, active: true } },
     ]);
-    if (planDetails.length > 0) {
-      return res.status(200).json({
-        success: true,
-        message: `Floor plan found`,
-        data: planDetails,
-      });
-    } else {
-      res.status(400).json({ message: "No Floor Plan Details Found" });
-    }
+    return res.status(200).json({
+      success: true,
+      message: `Floor plan found`,
+      floorPlan: planDetails,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
