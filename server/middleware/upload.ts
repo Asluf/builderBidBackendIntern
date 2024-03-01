@@ -23,13 +23,14 @@ export const uploadFloorPlan = (
 ) => {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const { floorplan_name, type, scale, notes } = req.body;
-      const floorPlanData = { floorplan_name, type, scale, notes };
+      // const { floorplan_name, type, scale, notes } = req.body;
+      // const floorPlanData = { floorplan_name, type, scale, notes };
+      // console.log(req);
 
-      const validationErrors = validateFloorPlanData(floorPlanData);
-      if (validationErrors) {
-        return res.status(400).json({ error: validationErrors.join(", ") });
-      }
+      // const validationErrors = validateFloorPlanData(floorPlanData);
+      // if (validationErrors) {
+      //   return res.status(400).json({ error: validationErrors.join(", ") });
+      // }
 
       cb(null, "uploads/");
     },
